@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+
+<hibernate-mapping>
+    
+    <class name="com.samaritan.entity.Employee" table="employee" schema="dummy">
+        
+        <id name="id" column="id" type="java.lang.Integer">
+            <generator class="identity"/>
+        </id>
+        
+        <property name="firstName" column="f_name"/>
+        
+        <property name="lastName" column="l_name"/>
+        
+        <property name="email" column="email"/>
+            
+    </class>
+    
+</hibernate-mapping>
