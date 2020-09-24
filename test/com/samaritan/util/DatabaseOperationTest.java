@@ -5,6 +5,7 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.junit.*;
 
 import java.io.Serializable;
+import java.util.List;
 
 import static org.junit.Assert.* ;
 
@@ -52,4 +53,13 @@ public class DatabaseOperationTest {
         insertObjectIntoEntityReturnsNonNullIdOnSuccess() ;
     }
 
+    /**
+     * This test should pass if all the records in an entity are returned.
+     */
+    @Test
+    public void selectAllRecordsFromEntityWithoutOwnedRelations(){
+
+        List<Employee> allEmployees = databaseOperation.selectFromEntity(Employee.class) ;
+        assertEquals(3, allEmployees.size()) ;
+    }
 }

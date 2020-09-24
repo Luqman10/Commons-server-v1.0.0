@@ -1,6 +1,9 @@
 package com.samaritan.util;
 
 import java.io.Serializable;
+import java.util.List;
+
+import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -50,5 +53,31 @@ public class DatabaseOperation{
         
         return id ;
     }
-    
+
+    /**
+     * select all the records in an entity (without the entity owning any relations with other entities)
+     * @param entityClass the class of the entity to select from
+     * @param <T> the entity type
+     * @return a list of objects of the entity type selected from the entity.
+     */
+    public <T> List<T> selectFromEntity(Class<T> entityClass){
+
+        Session session = sessionFactory.openSession() ;
+        Query<T> query = session.createQuery(createFromClause(entityClass),entityClass) ;
+        List<T> allRecordsInEntity = query.getResultList() ;
+        session.close() ;
+        return allRecordsInEntity ;
+    }
+
+    /**
+     * create a clause (string in the format of 'FROM [entity_name]')
+     * @param entityClass the class of the entity from which [entity_name] will be derived
+     * @param <T> the type of the entity
+     * @return the created string
+     */
+    private <T> String createFromClause(Class<T> entityClass){
+
+        return "FROM " + entityClass.getName() ;
+    }
+
 }
