@@ -14,5 +14,7 @@
 
         <mapping class="com.samaritan.entity.Employee"/>
         <mapping resource="com/samaritan/entity/Employee.hbm.xml"/>
+        <mapping class="com.samaritan.entity.Department"/>
+        <mapping resource="com/samaritan/entity/Department.hbm.xml"/>
     </session-factory>
 </hibernate-configuration>

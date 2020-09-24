@@ -70,6 +70,38 @@ public class DatabaseOperation{
     }
 
     /**
+     * select all the records in an entity (that has relations with other entities) using the given join clauses
+     * @param entityClass the class of the entity to select from
+     * @param entityAlias the alias to use for the entity in the query
+     * @param joinClauses the list of join clauses to use in querying the entity
+     * @param <T> the entity type
+     * @return a list of objects of the entity type selected from the entity.
+     */
+    public <T> List<T> selectFromEntity(Class<T> entityClass, String entityAlias, List<JoinClause> joinClauses){
+
+        Session session = sessionFactory.openSession() ;
+        String queryString = createFromClause(entityClass) + " " + entityAlias + combineJoinClauses(joinClauses) ;
+        Query<T> query = session.createQuery(queryString, entityClass) ;
+        List<T> allRecordsInEntity = query.getResultList() ;
+        session.close() ;
+        return allRecordsInEntity ;
+    }
+
+    /**
+     * call getJoinClause() on each joinClause in the list and combine(concat) all the returned string values into one.
+     * @param joinClauses the list of joinClause instances
+     * @return the concatenated string of all the joinClauses' getJoinClause()
+     */
+    private String combineJoinClauses(List<JoinClause> joinClauses){
+
+        StringBuilder combinedJoinClauses = new StringBuilder() ;
+        for(JoinClause joinClause : joinClauses)
+            combinedJoinClauses.append(" ").append(joinClause.getJoinClause()) ;
+
+        return combinedJoinClauses.toString() ;
+    }
+
+    /**
      * create a clause (string in the format of 'FROM [entity_name]')
      * @param entityClass the class of the entity from which [entity_name] will be derived
      * @param <T> the type of the entity
