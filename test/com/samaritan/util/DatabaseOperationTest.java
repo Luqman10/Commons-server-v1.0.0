@@ -1,15 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.samaritan.util;
 
 import com.samaritan.entity.Employee;
+import org.hibernate.exception.ConstraintViolationException;
+import org.junit.*;
+
 import java.io.Serializable;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+
 import static org.junit.Assert.* ;
 
 /**
@@ -17,18 +13,18 @@ import static org.junit.Assert.* ;
  * @author electron
  */
 public class DatabaseOperationTest {
-    
-   DatabaseOperation databaseOperation ;
-    
+
+    private DatabaseOperation databaseOperation ;
+
     @Before
     public void setUp() {
-        
+
         databaseOperation = new DatabaseOperation(HibernateUtil.getSessionFactory()) ;
     }
-    
+
     @After
     public void tearDown() {
-        
+
         databaseOperation = null ;
     }
 
@@ -37,7 +33,7 @@ public class DatabaseOperationTest {
      */
     @Test
     public void insertObjectIntoEntityReturnsNonNullIdOnSuccess(){
-        
+
         Employee employee = new Employee() ;
         employee.setFirstName("Luqman") ;
         employee.setLastName("Abdul Qadir") ;
@@ -45,5 +41,15 @@ public class DatabaseOperationTest {
         Serializable id = databaseOperation.insertObjectIntoEntity(employee) ;
         assertNotNull(id) ;
     }
-    
+
+    /**
+     * This test should pass if a ConstraintViolationException is thrown because the insertion operation violates a
+     * constraint
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void insertObjectIntoEntityThrowsExceptionOnConstraintViolation(){
+
+        insertObjectIntoEntityReturnsNonNullIdOnSuccess() ;
+    }
+
 }
