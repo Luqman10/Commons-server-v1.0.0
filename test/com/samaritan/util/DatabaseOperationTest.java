@@ -13,8 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * Test class for DatabaseOperation
@@ -145,7 +144,7 @@ public class DatabaseOperationTest {
      * This test should pass if 3 records are returned.
      */
     @Test
-    public void selectAllRecordsFromEntityWithoutOwnedRelationsUsingMultipleWhereCondition(){
+    public void selectAllRecordsFromEntityWithoutOwnedRelationsUsingMultipleWhereConditions(){
 
         String whereCondition = "id = :id OR firstName = :firstName OR email = :email" ;
         Map<String,Object> namedParams = new HashMap<>() ;
@@ -154,5 +153,59 @@ public class DatabaseOperationTest {
         namedParams.put("email", "makaveli@deathrow.com") ;
         List<Employee> matchedEmployees = databaseOperation.selectFromEntity(Employee.class, whereCondition, namedParams) ;
         assertEquals(3, matchedEmployees.size()) ;
+    }
+
+    /**
+     * This test should pass if 1 record is returned and the first name of the manager of that record is Luqman.
+     */
+    @Test
+    public void selectAllRecordsFromEntityWithOwnedRelationsUsingInnerJoinAndSingleWhereCondition(){
+
+        //create join clauses list
+        String parentEntityAlias = "dept" ;
+        List<JoinClause> joinClauses = new ArrayList<>() ;
+        joinClauses.add(new JoinClause(parentEntityAlias, "manager", JoinClause.INNER_JOIN)) ;
+
+        //where condition and namedParams
+        String whereCondition = "dept.manager.id = :id" ;
+        Map<String,Object> namedParams = new HashMap<>() ;
+        namedParams.put("id", 6) ;
+
+        //query the entity with join clauses and a single where condition
+        List<Department> allDepartments =
+                databaseOperation.selectFromEntity(Department.class, parentEntityAlias, joinClauses, whereCondition, namedParams) ;
+
+        //assert that only 1 department was returned and the first name of the manager in the returned department is
+        // Luqman(it means data from the related employee entity has been fetched).
+        assertTrue(allDepartments.size() == 1 &&
+                allDepartments.get(0).getManager().getFirstName().equals("Luqman")) ;
+    }
+
+    /**
+     * This test should pass if 3 records are returned.
+     */
+    @Test
+    public void selectAllRecordsFromEntityWithOwnedRelationsUsingInnerJoinAndMultipleWhereConditions(){
+
+        //create join clauses list
+        String parentEntityAlias = "dept" ;
+        List<JoinClause> joinClauses = new ArrayList<>() ;
+        joinClauses.add(new JoinClause(parentEntityAlias, "manager", JoinClause.INNER_JOIN)) ;
+
+        //where condition and namedParams
+        String whereCondition = "dept.manager.id = :id OR " +
+                "dept.manager.firstName = :firstName OR " +
+                "dept.manager.email = :email" ;
+        Map<String,Object> namedParams = new HashMap<>() ;
+        namedParams.put("id", 6) ;
+        namedParams.put("firstName","Mark") ;
+        namedParams.put("email", "makaveli@deathrow.com") ;
+
+        //query the entity with join clauses and a single where condition
+        List<Department> allDepartments =
+                databaseOperation.selectFromEntity(Department.class, parentEntityAlias, joinClauses, whereCondition, namedParams) ;
+
+        //assert that 3 departments were returned
+        assertEquals(3, allDepartments.size()) ;
     }
 }
