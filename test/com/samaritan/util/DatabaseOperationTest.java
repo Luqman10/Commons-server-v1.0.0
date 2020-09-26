@@ -3,7 +3,9 @@ package com.samaritan.util;
 import com.samaritan.entity.Department;
 import com.samaritan.entity.Employee;
 import org.hibernate.exception.ConstraintViolationException;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -11,7 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.* ;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Test class for DatabaseOperation

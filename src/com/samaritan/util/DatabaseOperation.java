@@ -1,14 +1,14 @@
 package com.samaritan.util;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-
-import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.query.Query;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class is used to make database operations(insert,select,update and delete). It uses Hibernate to make 
