@@ -7,7 +7,9 @@ import org.junit.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.* ;
 
@@ -121,5 +123,33 @@ public class DatabaseOperationTest {
 
         //assert that 3 departments were returned.
         assertEquals(3, allDepartments.size()) ;
+    }
+
+    /**
+     * This test should pass if 1 record is returned.
+     */
+    @Test
+    public void selectAllRecordsFromEntityWithoutOwnedRelationsUsingSingleWhereCondition(){
+
+        String whereCondition = "id = :id" ;
+        Map<String,Object> namedParams = new HashMap<>() ;
+        namedParams.put("id", 6) ;
+        List<Employee> matchedEmployees = databaseOperation.selectFromEntity(Employee.class, whereCondition, namedParams) ;
+        assertEquals(1, matchedEmployees.size()) ;
+    }
+
+    /**
+     * This test should pass if 3 records are returned.
+     */
+    @Test
+    public void selectAllRecordsFromEntityWithoutOwnedRelationsUsingMultipleWhereCondition(){
+
+        String whereCondition = "id = :id OR firstName = :firstName OR email = :email" ;
+        Map<String,Object> namedParams = new HashMap<>() ;
+        namedParams.put("id", 6) ;
+        namedParams.put("firstName", "Mark") ;
+        namedParams.put("email", "makaveli@deathrow.com") ;
+        List<Employee> matchedEmployees = databaseOperation.selectFromEntity(Employee.class, whereCondition, namedParams) ;
+        assertEquals(3, matchedEmployees.size()) ;
     }
 }
