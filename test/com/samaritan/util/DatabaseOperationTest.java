@@ -208,4 +208,27 @@ public class DatabaseOperationTest {
         //assert that 3 departments were returned
         assertEquals(3, allDepartments.size()) ;
     }
+
+    /**
+     * This test should pass if all the tuples(in this case 3) in an entity are returned.
+     */
+    @Test
+    public void selectColumnsFromAllTuplesInEntity(){
+
+        List tuples = databaseOperation.selectColumnsFromEntity("Employee", "emp", "id",
+                "firstName","lastName","email") ;
+        assertEquals(3, tuples.size()) ;
+    }
+
+    /**
+     * This test should pass if the expected data (in this case Luqman) is returned.
+     */
+    @Test
+    public void selectColumnsFromAllTuplesInEntityReturnsTheRightData(){
+
+        List tuples = databaseOperation.selectColumnsFromEntity("Employee", "emp", "id",
+                "firstName","lastName","email") ;
+        String firstNameOfFirstEmployee = (String) ((Object[])tuples.get(0))[1] ;
+        assertEquals("Luqman", firstNameOfFirstEmployee) ;
+    }
 }

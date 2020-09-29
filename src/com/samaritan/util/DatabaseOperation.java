@@ -193,6 +193,56 @@ public class DatabaseOperation{
     }
 
     /**
+     * select column(s) from all rows in the given entity.
+     * @param entityName the name of the entity to select from
+     * @param entityAlias the alias to use for the entity in the select query
+     * @param columns a variable-length list of columns to select from the entity
+     * @throws IllegalStateException if any of the arguments is null or empty.
+     * @return a list of object arrays holding the column values for each row.
+     */
+    public List selectColumnsFromEntity(String entityName, String entityAlias, String ... columns) throws
+            IllegalStateException{
+
+        if(entityName == null || entityName.trim().equals("") || entityAlias == null || entityAlias.trim().equals("") ||
+        columns == null || columns.length == 0)
+            throw new IllegalStateException("None of the arguments can be null or empty.") ;
+
+        Session session = sessionFactory.openSession() ;
+        String queryString = "SELECT " + createColumnsString(entityAlias,columns) + "FROM " + entityName + " as " +
+                entityAlias ;
+        Query query = session.createQuery(queryString) ;
+        List listOfTuples = query.list() ;
+        session.close() ;
+        return listOfTuples ;
+    }
+
+    /**
+     * create a comma separated string of all the columns(prefixed with 'entityAlias.') in the columns array
+     * @param entityAlias the entity alias to prefix each column with
+     * @param columns the array of columns.
+     * @return the created string.
+     */
+    private String createColumnsString(String entityAlias, String[] columns){
+
+        //prefix(entityAlias.) to append to every column
+        String prefix = entityAlias + "." ;
+        StringBuilder columnsStringBuilder = new StringBuilder() ;
+        //for every column, create entityAlias.column and append to string builder
+        for(int i = 0 ; i < columns.length ; i++){
+
+            columnsStringBuilder.append(prefix).append(columns[i]) ;
+            //if the current index is not the last, append [, ] to the string builder.
+            if(i != columns.length - 1)
+                columnsStringBuilder.append(", ") ;
+            //if its the last index, just append space to the string builder.
+            else
+                columnsStringBuilder.append(" ") ;
+        }
+
+        return columnsStringBuilder.toString() ;
+    }
+
+    /**
      * call getJoinClause() on each joinClause in the list and combine(concat) all the returned string values into one.
      * @param joinClauses the list of joinClause instances
      * @return the concatenated string of all the joinClauses' getJoinClause()
