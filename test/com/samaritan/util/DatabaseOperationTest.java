@@ -2,6 +2,7 @@ package com.samaritan.util;
 
 import com.samaritan.entity.Department;
 import com.samaritan.entity.Employee;
+import javafx.util.Pair;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.After;
 import org.junit.Before;
@@ -210,10 +211,10 @@ public class DatabaseOperationTest {
     }
 
     /**
-     * This test should pass if all the tuples(in this case 3) in an entity are returned.
+     * This test should pass if all the tuples(in this case 3) in an entity(without relations) are returned.
      */
     @Test
-    public void selectColumnsFromAllTuplesInEntity(){
+    public void selectColumnsFromAllTuplesInEntityWithoutRelations(){
 
         List tuples = databaseOperation.selectColumnsFromEntity("Employee", "emp", "id",
                 "firstName","lastName","email") ;
@@ -224,11 +225,54 @@ public class DatabaseOperationTest {
      * This test should pass if the expected data (in this case Luqman) is returned.
      */
     @Test
-    public void selectColumnsFromAllTuplesInEntityReturnsTheRightData(){
+    public void selectColumnsFromAllTuplesInEntityWithoutRelationsReturnsTheRightData(){
 
         List tuples = databaseOperation.selectColumnsFromEntity("Employee", "emp", "id",
                 "firstName","lastName","email") ;
         String firstNameOfFirstEmployee = (String) ((Object[])tuples.get(0))[1] ;
         assertEquals("Luqman", firstNameOfFirstEmployee) ;
+    }
+
+    /**
+     * This test should pass if all the tuples(in this case 3) in an entity(with relations) are returned.
+     */
+    @Test
+    public void selectColumnsFromAllTuplesInEntityWithRelations(){
+
+        List<JoinClause> joinClauses = new ArrayList<>() ;
+        joinClauses.add(new JoinClause("dept", "manager", JoinClause.INNER_JOIN)) ;
+
+        List<Pair<String,String>> pairs = new ArrayList<>() ;
+        pairs.add(new Pair<>("dept", "id")) ;
+        pairs.add(new Pair<>("dept", "name")) ;
+        pairs.add(new Pair<>("dept", "manager.firstName")) ;
+        pairs.add(new Pair<>("dept", "manager.lastName")) ;
+        pairs.add(new Pair<>("dept", "manager.email")) ;
+
+        List tuples = databaseOperation.selectColumnsFromEntity("Department", "dept", joinClauses, pairs) ;
+
+        assertEquals(3, tuples.size()) ;
+    }
+
+    /**
+     * This test should pass if the expected data (in this case luqman10@samaritan.com) is returned.
+     */
+    @Test
+    public void selectColumnsFromAllTuplesInEntityWithRelationsReturnsTheRightData(){
+
+        List<JoinClause> joinClauses = new ArrayList<>() ;
+        joinClauses.add(new JoinClause("dept", "manager", JoinClause.INNER_JOIN)) ;
+
+        List<Pair<String,String>> pairs = new ArrayList<>() ;
+        pairs.add(new Pair<>("dept", "id")) ;
+        pairs.add(new Pair<>("dept", "name")) ;
+        pairs.add(new Pair<>("dept", "manager.firstName")) ;
+        pairs.add(new Pair<>("dept", "manager.lastName")) ;
+        pairs.add(new Pair<>("dept", "manager.email")) ;
+
+        List tuples = databaseOperation.selectColumnsFromEntity("Department", "dept", joinClauses, pairs) ;
+        String email = "luqman10@samaritan.com" ;
+
+        assertEquals(email, ((Object[])tuples.get(0))[5]) ;
     }
 }

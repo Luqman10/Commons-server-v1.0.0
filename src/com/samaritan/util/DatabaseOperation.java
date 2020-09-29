@@ -1,5 +1,6 @@
 package com.samaritan.util;
 
+import javafx.util.Pair;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -193,7 +194,7 @@ public class DatabaseOperation{
     }
 
     /**
-     * select column(s) from all rows in the given entity.
+     * select column(s) from all rows in the given entity (without relations to other entities).
      * @param entityName the name of the entity to select from
      * @param entityAlias the alias to use for the entity in the select query
      * @param columns a variable-length list of columns to select from the entity
@@ -214,6 +215,61 @@ public class DatabaseOperation{
         List listOfTuples = query.list() ;
         session.close() ;
         return listOfTuples ;
+    }
+
+    /**
+     * select column(s) from all rows in the given parent entity related to other entities.
+     * @param parentEntityName the parent entity name
+     * @param parentEntityAlias the alias to use for the parent entity
+     * @param joinClauses the list of join clauses specifying which type of join to use between the parent entity and
+     * which child entity
+     * @param pairsOfEntityNamesAndColumnsToSelect list of pairs that hold the name/alias of an entity and the column
+     * to select from that entity.
+     * @throws IllegalStateException if any of the arguments is empty or null.
+     * @return a list of object arrays holding the column values for each row.
+     */
+    public List selectColumnsFromEntity(String parentEntityName, String parentEntityAlias, List<JoinClause> joinClauses,
+                                        List<Pair<String,String>> pairsOfEntityNamesAndColumnsToSelect)throws
+            IllegalStateException{
+
+        if(parentEntityName == null || parentEntityName.trim().equals("") || parentEntityAlias == null ||
+        parentEntityAlias.trim().equals("") || joinClauses == null || joinClauses.isEmpty() ||
+        pairsOfEntityNamesAndColumnsToSelect == null || pairsOfEntityNamesAndColumnsToSelect.isEmpty())
+            throw new IllegalStateException("None of the arguments may be null.") ;
+
+        Session session = sessionFactory.openSession() ;
+        String queryString = "SELECT " + parentEntityAlias + ", " + createColumnsStringForColumnsThatBelongToDifferentEntities(pairsOfEntityNamesAndColumnsToSelect) +
+                "FROM " + parentEntityName + " as " + parentEntityAlias + " " + combineJoinClauses(joinClauses) ;
+        Query query = session.createQuery(queryString) ;
+        List listOfTuples = query.list() ;
+        session.close() ;
+        return listOfTuples ;
+    }
+
+    /**
+     * create a comma separated string of all the columns(prefixed with 'entityAlias.') in the pairs in the list.
+     * NB: This method is used to create a columns string for columns belonging to different entities(alias).
+     * @param pairsOfEntityNamesAndColumnsToSelect the list of pairs(entity name/alias, column)
+     * @return the created string
+     */
+    private String createColumnsStringForColumnsThatBelongToDifferentEntities(List<Pair<String, String>> pairsOfEntityNamesAndColumnsToSelect){
+
+        StringBuilder columnsStringBuilder = new StringBuilder() ;
+
+        for(int i = 0 ; i < pairsOfEntityNamesAndColumnsToSelect.size() ; i++){
+
+            Pair<String,String> pair = pairsOfEntityNamesAndColumnsToSelect.get(i) ;
+            columnsStringBuilder.append(pair.getKey()).append(".").append(pair.getValue()) ;
+
+            //if the current index is not the last, append [, ] to the string builder.
+            if(i != pairsOfEntityNamesAndColumnsToSelect.size() - 1)
+                columnsStringBuilder.append(", ") ;
+                //if its the last index, just append space to the string builder.
+            else
+                columnsStringBuilder.append(" ") ;
+        }
+
+        return columnsStringBuilder.toString() ;
     }
 
     /**
