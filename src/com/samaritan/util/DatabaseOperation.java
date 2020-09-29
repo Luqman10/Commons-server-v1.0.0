@@ -208,8 +208,8 @@ public class DatabaseOperation{
             throw new IllegalStateException("None of the arguments can be null or empty.") ;
 
         Session session = sessionFactory.openSession() ;
-        String queryString = "SELECT " + createColumnsString(entityAlias,columns) + "FROM " + entityName + " as " +
-                entityAlias ;
+        String queryString = "SELECT " + createColumnsStringForColumnsThatBelongToSingleEntity(entityAlias,columns) +
+                "FROM " + entityName + " as " + entityAlias ;
         Query query = session.createQuery(queryString) ;
         List listOfTuples = query.list() ;
         session.close() ;
@@ -217,12 +217,13 @@ public class DatabaseOperation{
     }
 
     /**
-     * create a comma separated string of all the columns(prefixed with 'entityAlias.') in the columns array
+     * create a comma separated string of all the columns(prefixed with 'entityAlias.') in the columns array.
+     * NB: This method is used to create a columns string for columns all belonging to a single entity(alias).
      * @param entityAlias the entity alias to prefix each column with
      * @param columns the array of columns.
      * @return the created string.
      */
-    private String createColumnsString(String entityAlias, String[] columns){
+    private String createColumnsStringForColumnsThatBelongToSingleEntity(String entityAlias, String[] columns){
 
         //prefix(entityAlias.) to append to every column
         String prefix = entityAlias + "." ;
