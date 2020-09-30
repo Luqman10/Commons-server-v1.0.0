@@ -304,4 +304,66 @@ public class DatabaseOperationTest {
         Object[] columns = (Object[]) tuples.get(0) ;
         assertEquals("Luqman", columns[1]) ;
     }
+
+    /**
+     * This test should pass if only 1 tuple is returned
+     */
+    @Test
+    public void selectColumnsFromTuplesThatSatisfyWhereConditionInEntityWithRelations(){
+
+        String parentEntityName = "Department" ;
+        String parentEntityAlias = "dept" ;
+
+        List<JoinClause> joinClauses = new ArrayList<>() ;
+        joinClauses.add(new JoinClause(parentEntityAlias,"manager", JoinClause.INNER_JOIN)) ;
+
+        List<Pair<String,String>> pairsOfEntityNamesAndCols = new ArrayList<>() ;
+        pairsOfEntityNamesAndCols.add(new Pair<>(parentEntityAlias,"id")) ;
+        pairsOfEntityNamesAndCols.add(new Pair<>(parentEntityAlias,"name")) ;
+        pairsOfEntityNamesAndCols.add(new Pair<>(parentEntityAlias + ".manager","firstName")) ;
+        pairsOfEntityNamesAndCols.add(new Pair<>(parentEntityAlias + ".manager","lastName")) ;
+        pairsOfEntityNamesAndCols.add(new Pair<>(parentEntityAlias + ".manager","email")) ;
+
+        String whereCondition = parentEntityAlias + ".id = :id" ;
+
+        Map<String,Object> namedParams = new HashMap<>() ;
+        namedParams.put("id", 1) ;
+
+        List tuples = databaseOperation.selectColumnsFromEntity(parentEntityName,parentEntityAlias,joinClauses,
+                pairsOfEntityNamesAndCols,whereCondition,namedParams) ;
+
+        assertEquals(1, tuples.size()) ;
+    }
+
+    /**
+     * This test should pass when the email col of the returned tuple is luqman10@samaritan.com
+     */
+    @Test
+    public void selectColumnsFromTuplesThatSatisfyWhereConditionInEntityWithRelationsReturnsExpectedData(){
+
+        String parentEntityName = "Department" ;
+        String parentEntityAlias = "dept" ;
+
+        List<JoinClause> joinClauses = new ArrayList<>() ;
+        joinClauses.add(new JoinClause(parentEntityAlias,"manager", JoinClause.INNER_JOIN)) ;
+
+        List<Pair<String,String>> pairsOfEntityNamesAndCols = new ArrayList<>() ;
+        pairsOfEntityNamesAndCols.add(new Pair<>(parentEntityAlias,"id")) ;
+        pairsOfEntityNamesAndCols.add(new Pair<>(parentEntityAlias,"name")) ;
+        pairsOfEntityNamesAndCols.add(new Pair<>(parentEntityAlias + ".manager","firstName")) ;
+        pairsOfEntityNamesAndCols.add(new Pair<>(parentEntityAlias + ".manager","lastName")) ;
+        pairsOfEntityNamesAndCols.add(new Pair<>(parentEntityAlias + ".manager","email")) ;
+
+        String whereCondition = parentEntityAlias + ".id = :id" ;
+
+        Map<String,Object> namedParams = new HashMap<>() ;
+        namedParams.put("id", 1) ;
+
+        List tuples = databaseOperation.selectColumnsFromEntity(parentEntityName,parentEntityAlias,joinClauses,
+                pairsOfEntityNamesAndCols,whereCondition,namedParams) ;
+
+        Object[] cols = (Object[]) tuples.get(0) ;
+
+        assertEquals("luqman10@samaritan.com", cols[5]) ;
+    }
 }

@@ -277,6 +277,42 @@ public class DatabaseOperation{
     }
 
     /**
+     * select column(s) from tuples that match the given where condition in the given parent entity related to other entities.
+     * @param parentEntityName the parent entity name
+     * @param parentEntityAlias the alias to use for the parent entity
+     * @param joinClauses the list of join clauses specifying which type of join to use between the parent entity and
+     * which child entity
+     * @param pairsOfEntityNamesAndColumnsToSelect list of pairs that hold the name/alias of an entity and the column
+     * to select from that entity.
+     * @param whereCondition the condition(appears after the WHERE keyword in the query) to use in filtering the selected
+     * tuples.
+     * @param namedParameters the map of named parameters used in the query and the values to replace them with.
+     * @throws IllegalStateException if any of the arguments is empty or null.
+     * @return a list of object arrays holding the column values for each row.
+     */
+    public List selectColumnsFromEntity(String parentEntityName, String parentEntityAlias, List<JoinClause> joinClauses,
+                                        List<Pair<String,String>> pairsOfEntityNamesAndColumnsToSelect, String whereCondition,
+                                        Map<String,Object> namedParameters)throws IllegalStateException{
+
+        if(parentEntityName == null || parentEntityName.trim().equals("") || parentEntityAlias == null ||
+                parentEntityAlias.trim().equals("") || joinClauses == null || joinClauses.isEmpty() ||
+                pairsOfEntityNamesAndColumnsToSelect == null || pairsOfEntityNamesAndColumnsToSelect.isEmpty() ||
+                whereCondition == null || whereCondition.trim().equals("") || namedParameters == null || namedParameters.isEmpty())
+            throw new IllegalStateException("None of the arguments may be null.") ;
+
+        Session session = sessionFactory.openSession() ;
+        String queryString = "SELECT " + parentEntityAlias + ", " + createColumnsStringForColumnsThatBelongToDifferentEntities(pairsOfEntityNamesAndColumnsToSelect) +
+                "FROM " + parentEntityName + " as " + parentEntityAlias + " " + combineJoinClauses(joinClauses) + " " +
+                createWhereClause(whereCondition) ;
+        Query query = session.createQuery(queryString) ;
+        setNamedParametersInQuery(query, namedParameters) ;
+        List listOfTuples = query.list() ;
+        session.close() ;
+        return listOfTuples ;
+    }
+
+
+    /**
      * create a comma separated string of all the columns(prefixed with 'entityAlias.') in the pairs in the list.
      * NB: This method is used to create a columns string for columns belonging to different entities(alias).
      * @param pairsOfEntityNamesAndColumnsToSelect the list of pairs(entity name/alias, column)
