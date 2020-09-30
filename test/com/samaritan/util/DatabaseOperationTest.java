@@ -275,4 +275,33 @@ public class DatabaseOperationTest {
 
         assertEquals(email, ((Object[])tuples.get(0))[5]) ;
     }
+
+    /**
+     * This test should pass if only 1 tuple is returned.
+     */
+    @Test
+    public void selectColumnsFromTuplesThatSatisfyWhereConditionInEntityWithoutRelations(){
+
+        Map<String,Object> namedParams = new HashMap<>() ;
+        namedParams.put("id",6) ;
+
+        List tuples = databaseOperation.selectColumnsFromEntity("Employee", "emp", "emp.id = :id", namedParams, "id",
+                "firstName","lastName","email") ;
+        assertEquals(1, tuples.size()) ;
+    }
+
+    /**
+     * This test should pass if the first name col in the returned tuple is Luqman
+     */
+    @Test
+    public void selectColumnsFromTuplesThatSatisfyWhereConditionInEntityWithoutRelationsReturnsExpectedData(){
+
+        Map<String,Object> namedParams = new HashMap<>() ;
+        namedParams.put("id",6) ;
+
+        List tuples = databaseOperation.selectColumnsFromEntity("Employee", "emp", "emp.id = :id", namedParams, "id",
+                "firstName","lastName","email") ;
+        Object[] columns = (Object[]) tuples.get(0) ;
+        assertEquals("Luqman", columns[1]) ;
+    }
 }

@@ -117,9 +117,8 @@ public class DatabaseOperation{
      * parameters in the query.
      * @param query the query instance
      * @param namedParameters the map holding named parameters and their values
-     * @param <T> the type of the entity we are querying
      */
-    private <T> void setNamedParametersInQuery(Query<T> query, Map<String, Object> namedParameters){
+    private void setNamedParametersInQuery(Query query, Map<String, Object> namedParameters){
 
         for(String key : namedParameters.keySet())
             query.setParameter(key, namedParameters.get(key)) ;
@@ -241,6 +240,37 @@ public class DatabaseOperation{
         String queryString = "SELECT " + parentEntityAlias + ", " + createColumnsStringForColumnsThatBelongToDifferentEntities(pairsOfEntityNamesAndColumnsToSelect) +
                 "FROM " + parentEntityName + " as " + parentEntityAlias + " " + combineJoinClauses(joinClauses) ;
         Query query = session.createQuery(queryString) ;
+        List listOfTuples = query.list() ;
+        session.close() ;
+        return listOfTuples ;
+    }
+
+    /**
+     * select column(s) from rows that satisfy the given where condition in the given entity
+     * (without relations to other entities).
+     * @param entityName the name of the entity to select from
+     * @param entityAlias the alias to use for the entity in the select query
+     * @param columns a variable-length list of columns to select from the entity
+     * @param whereCondition the condition(that comes after the WHERE keyword in the query) to be used in filtering
+     * the tuples.
+     * @param namedParameters a map of named parameters in the query and the values to replace them with.
+     * @throws IllegalStateException if any of the arguments is null or empty.
+     * @return a list of object arrays holding the column values for each row.
+     */
+    public List selectColumnsFromEntity(String entityName, String entityAlias, String whereCondition,
+                                        Map<String,Object> namedParameters, String ... columns) throws
+            IllegalStateException{
+
+        if(entityName == null || entityName.trim().equals("") || entityAlias == null || entityAlias.trim().equals("") ||
+                columns == null || columns.length == 0 || whereCondition == null || whereCondition.trim().equals("") ||
+                namedParameters == null || namedParameters.isEmpty())
+            throw new IllegalStateException("None of the arguments can be null or empty.") ;
+
+        Session session = sessionFactory.openSession() ;
+        String queryString = "SELECT " + createColumnsStringForColumnsThatBelongToSingleEntity(entityAlias,columns) +
+                "FROM " + entityName + " as " + entityAlias + " " + createWhereClause(whereCondition) ;
+        Query query = session.createQuery(queryString) ;
+        setNamedParametersInQuery(query, namedParameters) ;
         List listOfTuples = query.list() ;
         session.close() ;
         return listOfTuples ;
