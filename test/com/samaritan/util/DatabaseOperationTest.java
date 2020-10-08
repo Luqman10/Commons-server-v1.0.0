@@ -385,4 +385,18 @@ public class DatabaseOperationTest {
         boolean success = databaseOperation.updateRecordsInEntity(entityName, colsAndValues, namedParams) ;
         assertTrue(success) ;
     }
+
+    @Test
+    public void updateRecordsThatSatisfyWhereConditionInEntity(){
+
+        String entityName = "Employee" ;
+        String colsAndValues = "firstName =: firstName" ;
+        String whereCondition = "email =: email" ;
+        Map<String,Object> namedParams = new HashMap<>() ;
+        namedParams.put("firstName","Tupac") ;
+        namedParams.put("email","makaveli@deathrow.com") ;
+
+        boolean success = databaseOperation.updateRecordsInEntity(entityName, colsAndValues, whereCondition, namedParams) ;
+        assertTrue(success) ;
+    }
 }

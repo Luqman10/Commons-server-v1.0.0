@@ -383,6 +383,43 @@ public class DatabaseOperation{
     }
 
     /**
+     * update records that satisfy a given where condition in an entity
+     * @param entityName the entity name
+     * @param columnsAndCorrespondingValues a string holding the columns to update and the corresponding values as named
+     * params(appears after the SET keyword).
+     * @param whereCondition the condition to use in filtering the records to update
+     * @param namedParameters a map of named parameters(key) used in columnsAndCorrespondingValues, whereCondition string and the values
+     * to replace them with.
+     * @throws HibernateException when there is an error in executing the update
+     * @return true if the update operation was successful
+     */
+    public boolean updateRecordsInEntity(String entityName, String columnsAndCorrespondingValues, String whereCondition, Map<String,Object> namedParameters)
+            throws HibernateException{
+
+        Transaction transaction = null ;
+        int success = 0 ;
+
+        try (Session session = sessionFactory.openSession()) {
+
+            transaction = session.beginTransaction() ;
+            String queryString = "UPDATE " + entityName + " SET " + columnsAndCorrespondingValues + " WHERE " + whereCondition ;
+            Query query = session.createQuery(queryString) ;
+            setNamedParametersInQuery(query, namedParameters) ;
+            success = query.executeUpdate() ;
+            transaction.commit() ;
+
+        }
+        catch (HibernateException ex){
+
+            if (transaction != null) transaction.rollback() ;
+            throw ex ;
+        }
+
+        return success > 0 ;
+    }
+
+
+    /**
      * create a comma separated string of all the columns(prefixed with 'entityAlias.') in the pairs in the list.
      * NB: This method is used to create a columns string for columns belonging to different entities(alias).
      * @param pairsOfEntityNamesAndColumnsToSelect the list of pairs(entity name/alias, column)
