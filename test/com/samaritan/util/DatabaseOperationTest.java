@@ -373,4 +373,16 @@ public class DatabaseOperationTest {
 
         assertEquals("luqman10@samaritan.com", cols[5]) ;
     }
+
+    @Test
+    public void updateAllRecordsInEntity(){
+
+        String entityName = "Employee" ;
+        String colsAndValues = "firstName =: firstName" ;
+        Map<String,Object> namedParams = new HashMap<>() ;
+        namedParams.put("firstName","Samaritan") ;
+
+        boolean success = databaseOperation.updateRecordsInEntity(entityName, colsAndValues, namedParams) ;
+        assertTrue(success) ;
+    }
 }
