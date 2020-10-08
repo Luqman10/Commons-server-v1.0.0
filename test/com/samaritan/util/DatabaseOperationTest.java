@@ -66,7 +66,7 @@ public class DatabaseOperationTest {
     @Test
     public void selectAllRecordsFromEntityWithoutOwnedRelations(){
 
-        List<Employee> allEmployees = databaseOperation.selectFromEntity(Employee.class) ;
+        List<Employee> allEmployees = databaseOperation.selectFromEntity(Employee.class, 0, 3) ;
         assertEquals(3, allEmployees.size()) ;
     }
 
@@ -82,7 +82,8 @@ public class DatabaseOperationTest {
         joinClauses.add(new JoinClause(parentEntityAlias, "manager", JoinClause.INNER_JOIN)) ;
 
         //query the entity with join clauses
-        List<Department> allDepartments = databaseOperation.selectFromEntity(Department.class, parentEntityAlias, joinClauses) ;
+        List<Department> allDepartments = databaseOperation.selectFromEntity(Department.class, parentEntityAlias, joinClauses,
+                0, 1) ;
 
         //assert that the first name of the manager in the first department is Luqman(it means data from the related employee entity
         // has been fetched).
@@ -103,7 +104,8 @@ public class DatabaseOperationTest {
         joinClauses.add(new JoinClause(parentEntityAlias, "manager", JoinClause.LEFT_OUTER_JOIN)) ;
 
         //query the entity with join clauses
-        List<Department> allDepartments = databaseOperation.selectFromEntity(Department.class, parentEntityAlias, joinClauses) ;
+        List<Department> allDepartments = databaseOperation.selectFromEntity(Department.class, parentEntityAlias, joinClauses,
+                0, 1) ;
 
         //assert that only one department was returned.
         assertEquals(1, allDepartments.size()) ;
@@ -122,7 +124,8 @@ public class DatabaseOperationTest {
         joinClauses.add(new JoinClause(parentEntityAlias, "manager", JoinClause.RIGHT_OUTER_JOIN)) ;
 
         //query the entity with join clauses
-        List<Department> allDepartments = databaseOperation.selectFromEntity(Department.class, parentEntityAlias, joinClauses) ;
+        List<Department> allDepartments = databaseOperation.selectFromEntity(Department.class, parentEntityAlias, joinClauses,
+                0, 3) ;
 
         //assert that 3 departments were returned.
         assertEquals(3, allDepartments.size()) ;
@@ -137,7 +140,8 @@ public class DatabaseOperationTest {
         String whereCondition = "id = :id" ;
         Map<String,Object> namedParams = new HashMap<>() ;
         namedParams.put("id", 6) ;
-        List<Employee> matchedEmployees = databaseOperation.selectFromEntity(Employee.class, whereCondition, namedParams) ;
+        List<Employee> matchedEmployees =
+                databaseOperation.selectFromEntity(Employee.class, whereCondition, namedParams, 0, 1) ;
         assertEquals(1, matchedEmployees.size()) ;
     }
 
@@ -152,7 +156,8 @@ public class DatabaseOperationTest {
         namedParams.put("id", 6) ;
         namedParams.put("firstName", "Mark") ;
         namedParams.put("email", "makaveli@deathrow.com") ;
-        List<Employee> matchedEmployees = databaseOperation.selectFromEntity(Employee.class, whereCondition, namedParams) ;
+        List<Employee> matchedEmployees =
+                databaseOperation.selectFromEntity(Employee.class, whereCondition, namedParams, 0, 3) ;
         assertEquals(3, matchedEmployees.size()) ;
     }
 
@@ -174,7 +179,7 @@ public class DatabaseOperationTest {
 
         //query the entity with join clauses and a single where condition
         List<Department> allDepartments =
-                databaseOperation.selectFromEntity(Department.class, parentEntityAlias, joinClauses, whereCondition, namedParams) ;
+                databaseOperation.selectFromEntity(Department.class, parentEntityAlias, joinClauses, whereCondition, namedParams, 0, 1) ;
 
         //assert that only 1 department was returned and the first name of the manager in the returned department is
         // Luqman(it means data from the related employee entity has been fetched).
@@ -204,7 +209,7 @@ public class DatabaseOperationTest {
 
         //query the entity with join clauses and a single where condition
         List<Department> allDepartments =
-                databaseOperation.selectFromEntity(Department.class, parentEntityAlias, joinClauses, whereCondition, namedParams) ;
+                databaseOperation.selectFromEntity(Department.class, parentEntityAlias, joinClauses, whereCondition, namedParams, 0, 3) ;
 
         //assert that 3 departments were returned
         assertEquals(3, allDepartments.size()) ;
@@ -216,7 +221,8 @@ public class DatabaseOperationTest {
     @Test
     public void selectColumnsFromAllTuplesInEntityWithoutRelations(){
 
-        List tuples = databaseOperation.selectColumnsFromEntity("Employee", "emp", "id",
+        List tuples =
+                databaseOperation.selectColumnsFromEntity("Employee", "emp", 0, 3, "id",
                 "firstName","lastName","email") ;
         assertEquals(3, tuples.size()) ;
     }
@@ -227,7 +233,7 @@ public class DatabaseOperationTest {
     @Test
     public void selectColumnsFromAllTuplesInEntityWithoutRelationsReturnsTheRightData(){
 
-        List tuples = databaseOperation.selectColumnsFromEntity("Employee", "emp", "id",
+        List tuples = databaseOperation.selectColumnsFromEntity("Employee", "emp", 0, 1,  "id",
                 "firstName","lastName","email") ;
         String firstNameOfFirstEmployee = (String) ((Object[])tuples.get(0))[1] ;
         assertEquals("Luqman", firstNameOfFirstEmployee) ;
@@ -249,7 +255,8 @@ public class DatabaseOperationTest {
         pairs.add(new Pair<>("dept", "manager.lastName")) ;
         pairs.add(new Pair<>("dept", "manager.email")) ;
 
-        List tuples = databaseOperation.selectColumnsFromEntity("Department", "dept", joinClauses, pairs) ;
+        List tuples =
+                databaseOperation.selectColumnsFromEntity("Department", "dept", joinClauses, pairs, 0, 3) ;
 
         assertEquals(3, tuples.size()) ;
     }
@@ -270,7 +277,7 @@ public class DatabaseOperationTest {
         pairs.add(new Pair<>("dept", "manager.lastName")) ;
         pairs.add(new Pair<>("dept", "manager.email")) ;
 
-        List tuples = databaseOperation.selectColumnsFromEntity("Department", "dept", joinClauses, pairs) ;
+        List tuples = databaseOperation.selectColumnsFromEntity("Department", "dept", joinClauses, pairs, 0, 1) ;
         String email = "luqman10@samaritan.com" ;
 
         assertEquals(email, ((Object[])tuples.get(0))[5]) ;
@@ -285,7 +292,7 @@ public class DatabaseOperationTest {
         Map<String,Object> namedParams = new HashMap<>() ;
         namedParams.put("id",6) ;
 
-        List tuples = databaseOperation.selectColumnsFromEntity("Employee", "emp", "emp.id = :id", namedParams, "id",
+        List tuples = databaseOperation.selectColumnsFromEntity("Employee", "emp", "emp.id = :id", namedParams, 0, 1,  "id",
                 "firstName","lastName","email") ;
         assertEquals(1, tuples.size()) ;
     }
@@ -299,7 +306,7 @@ public class DatabaseOperationTest {
         Map<String,Object> namedParams = new HashMap<>() ;
         namedParams.put("id",6) ;
 
-        List tuples = databaseOperation.selectColumnsFromEntity("Employee", "emp", "emp.id = :id", namedParams, "id",
+        List tuples = databaseOperation.selectColumnsFromEntity("Employee", "emp", "emp.id = :id", namedParams, 0, 1,  "id",
                 "firstName","lastName","email") ;
         Object[] columns = (Object[]) tuples.get(0) ;
         assertEquals("Luqman", columns[1]) ;
@@ -330,7 +337,7 @@ public class DatabaseOperationTest {
         namedParams.put("id", 1) ;
 
         List tuples = databaseOperation.selectColumnsFromEntity(parentEntityName,parentEntityAlias,joinClauses,
-                pairsOfEntityNamesAndCols,whereCondition,namedParams) ;
+                pairsOfEntityNamesAndCols,whereCondition,namedParams, 0, 1) ;
 
         assertEquals(1, tuples.size()) ;
     }
@@ -360,7 +367,7 @@ public class DatabaseOperationTest {
         namedParams.put("id", 1) ;
 
         List tuples = databaseOperation.selectColumnsFromEntity(parentEntityName,parentEntityAlias,joinClauses,
-                pairsOfEntityNamesAndCols,whereCondition,namedParams) ;
+                pairsOfEntityNamesAndCols,whereCondition,namedParams, 0, 1) ;
 
         Object[] cols = (Object[]) tuples.get(0) ;
 

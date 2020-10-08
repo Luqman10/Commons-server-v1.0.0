@@ -68,16 +68,20 @@ public class DatabaseOperation{
      * select all the records in an entity (without the entity owning any relations with other entities)
      * @param entityClass the class of the entity to select from
      * @param <T> the entity type
+     * @param start the index of the first result to return
+     * @param size the number of records to return
      * @throws IllegalStateException when entityClass is null
      * @return a list of objects of the entity type selected from the entity.
      */
-    public <T> List<T> selectFromEntity(Class<T> entityClass) throws IllegalStateException{
+    public <T> List<T> selectFromEntity(Class<T> entityClass, int start, int size) throws IllegalStateException{
 
         if(entityClass == null)
             throw new IllegalStateException("The class of the entity to select from cannot be null") ;
 
         Session session = sessionFactory.openSession() ;
         Query<T> query = session.createQuery(createFromClause(entityClass),entityClass) ;
+        query.setFirstResult(start) ;
+        query.setMaxResults(size) ;
         List<T> allRecordsInEntity = query.getResultList() ;
         session.close() ;
         return allRecordsInEntity ;
@@ -90,12 +94,15 @@ public class DatabaseOperation{
      * @param whereCondition the condition to use in the WHERE clause (excluding the WHERE keyword)
      * @param namedParameters a map of named parameters used in the where condition and the values to replace them
      * with
+     * @param start the index of first record to return
+     * @param size the number of records to return
      * @param <T> the entity type
      * @throws IllegalStateException when any of the parameters is null. if the where condition is empty.
      * if namedParameters is empty.
      * @return a list of objects of the entity type that satisfy the where condition
      */
-    public <T> List<T> selectFromEntity(Class<T> entityClass, String whereCondition, Map<String,Object> namedParameters)
+    public <T> List<T> selectFromEntity(Class<T> entityClass, String whereCondition, Map<String,Object> namedParameters,
+                                        int start, int size)
     throws IllegalStateException{
 
         if(entityClass == null || whereCondition == null || whereCondition.trim().equals("") || namedParameters == null
@@ -107,6 +114,8 @@ public class DatabaseOperation{
         String queryString = createFromClause(entityClass) + " " + createWhereClause(whereCondition) ;
         Query<T> query = session.createQuery(queryString, entityClass) ;
         setNamedParametersInQuery(query, namedParameters) ;
+        query.setFirstResult(start) ;
+        query.setMaxResults(size) ;
         List<T> recordsInEntityThatSatisfyWhereCondition = query.getResultList() ;
         session.close() ;
         return recordsInEntityThatSatisfyWhereCondition ;
@@ -139,11 +148,14 @@ public class DatabaseOperation{
      * @param entityClass the class of the entity to select from
      * @param entityAlias the alias to use for the entity in the query
      * @param joinClauses the list of join clauses to use in querying the entity
+     * @param start the index of the first result to return
+     * @param size the number of records to return
      * @param <T> the entity type
      * @throws IllegalStateException when any of the params is null. if entityAlias is empty. if joinClauses is empty.
      * @return a list of objects of the entity type selected from the entity.
      */
-    public <T> List<T> selectFromEntity(Class<T> entityClass, String entityAlias, List<JoinClause> joinClauses)
+    public <T> List<T> selectFromEntity(Class<T> entityClass, String entityAlias, List<JoinClause> joinClauses, int start,
+                                        int size)
             throws IllegalStateException{
 
         if(entityClass == null || entityAlias == null || entityAlias.trim().equals("") || joinClauses == null ||
@@ -154,6 +166,8 @@ public class DatabaseOperation{
         Session session = sessionFactory.openSession() ;
         String queryString = createFromClause(entityClass) + " " + entityAlias + combineJoinClauses(joinClauses) ;
         Query<T> query = session.createQuery(queryString, entityClass) ;
+        query.setFirstResult(start) ;
+        query.setMaxResults(size) ;
         List<T> allRecordsInEntity = query.getResultList() ;
         session.close() ;
         return allRecordsInEntity ;
@@ -168,12 +182,14 @@ public class DatabaseOperation{
      * @param whereCondition the condition to use in the WHERE clause (excluding the WHERE keyword)
      * @param namedParameters a map of named parameters used in the where condition and the values to replace them
      * with.
+     * @param start the index of the first record to return
+     * @param size the max number of records to return
      * @param <T> the entity type
      * @throws IllegalStateException when any of the params is null. if entityAlias is empty. if joinClauses is empty.
      * @return a list of objects of the entity type selected from the entity.
      */
     public <T> List<T> selectFromEntity(Class<T> entityClass, String entityAlias, List<JoinClause> joinClauses,
-                                        String whereCondition, Map<String,Object> namedParameters)
+                                        String whereCondition, Map<String,Object> namedParameters, int start, int size)
             throws IllegalStateException{
 
         if(entityClass == null || entityAlias == null || entityAlias.trim().equals("") || joinClauses == null ||
@@ -187,6 +203,8 @@ public class DatabaseOperation{
         queryString += (" " + createWhereClause(whereCondition)) ;
         Query<T> query = session.createQuery(queryString, entityClass) ;
         setNamedParametersInQuery(query, namedParameters) ;
+        query.setFirstResult(start) ;
+        query.setMaxResults(size) ;
         List<T> recordsInEntityThatSatisfyWhereCondition = query.getResultList() ;
         session.close() ;
         return recordsInEntityThatSatisfyWhereCondition ;
@@ -196,11 +214,13 @@ public class DatabaseOperation{
      * select column(s) from all rows in the given entity (without relations to other entities).
      * @param entityName the name of the entity to select from
      * @param entityAlias the alias to use for the entity in the select query
+     * @param start the index of the first record to return
+     * @param size the max number of records to return
      * @param columns a variable-length list of columns to select from the entity
      * @throws IllegalStateException if any of the arguments is null or empty.
      * @return a list of object arrays holding the column values for each row.
      */
-    public List selectColumnsFromEntity(String entityName, String entityAlias, String ... columns) throws
+    public List selectColumnsFromEntity(String entityName, String entityAlias, int start, int size, String ... columns) throws
             IllegalStateException{
 
         if(entityName == null || entityName.trim().equals("") || entityAlias == null || entityAlias.trim().equals("") ||
@@ -211,6 +231,8 @@ public class DatabaseOperation{
         String queryString = "SELECT " + createColumnsStringForColumnsThatBelongToSingleEntity(entityAlias,columns) +
                 "FROM " + entityName + " as " + entityAlias ;
         Query query = session.createQuery(queryString) ;
+        query.setFirstResult(start) ;
+        query.setMaxResults(size) ;
         List listOfTuples = query.list() ;
         session.close() ;
         return listOfTuples ;
@@ -224,11 +246,13 @@ public class DatabaseOperation{
      * which child entity
      * @param pairsOfEntityNamesAndColumnsToSelect list of pairs that hold the name/alias of an entity and the column
      * to select from that entity.
+     * @param start the index of the first record to return
+     * @param size the max number of records to return
      * @throws IllegalStateException if any of the arguments is empty or null.
      * @return a list of object arrays holding the column values for each row.
      */
     public List selectColumnsFromEntity(String parentEntityName, String parentEntityAlias, List<JoinClause> joinClauses,
-                                        List<Pair<String,String>> pairsOfEntityNamesAndColumnsToSelect)throws
+                                        List<Pair<String,String>> pairsOfEntityNamesAndColumnsToSelect, int start, int size)throws
             IllegalStateException{
 
         if(parentEntityName == null || parentEntityName.trim().equals("") || parentEntityAlias == null ||
@@ -240,6 +264,8 @@ public class DatabaseOperation{
         String queryString = "SELECT " + parentEntityAlias + ", " + createColumnsStringForColumnsThatBelongToDifferentEntities(pairsOfEntityNamesAndColumnsToSelect) +
                 "FROM " + parentEntityName + " as " + parentEntityAlias + " " + combineJoinClauses(joinClauses) ;
         Query query = session.createQuery(queryString) ;
+        query.setFirstResult(start) ;
+        query.setMaxResults(size) ;
         List listOfTuples = query.list() ;
         session.close() ;
         return listOfTuples ;
@@ -254,11 +280,13 @@ public class DatabaseOperation{
      * @param whereCondition the condition(that comes after the WHERE keyword in the query) to be used in filtering
      * the tuples.
      * @param namedParameters a map of named parameters in the query and the values to replace them with.
+     * @param start the index of the first record to be returned
+     * @param size the max number of records to return
      * @throws IllegalStateException if any of the arguments is null or empty.
      * @return a list of object arrays holding the column values for each row.
      */
     public List selectColumnsFromEntity(String entityName, String entityAlias, String whereCondition,
-                                        Map<String,Object> namedParameters, String ... columns) throws
+                                        Map<String,Object> namedParameters, int start, int size, String ... columns) throws
             IllegalStateException{
 
         if(entityName == null || entityName.trim().equals("") || entityAlias == null || entityAlias.trim().equals("") ||
@@ -271,6 +299,8 @@ public class DatabaseOperation{
                 "FROM " + entityName + " as " + entityAlias + " " + createWhereClause(whereCondition) ;
         Query query = session.createQuery(queryString) ;
         setNamedParametersInQuery(query, namedParameters) ;
+        query.setFirstResult(start) ;
+        query.setMaxResults(size) ;
         List listOfTuples = query.list() ;
         session.close() ;
         return listOfTuples ;
@@ -287,12 +317,14 @@ public class DatabaseOperation{
      * @param whereCondition the condition(appears after the WHERE keyword in the query) to use in filtering the selected
      * tuples.
      * @param namedParameters the map of named parameters used in the query and the values to replace them with.
+     * @param start the index of the first record to return
+     * @param size the max number of records to return
      * @throws IllegalStateException if any of the arguments is empty or null.
      * @return a list of object arrays holding the column values for each row.
      */
     public List selectColumnsFromEntity(String parentEntityName, String parentEntityAlias, List<JoinClause> joinClauses,
                                         List<Pair<String,String>> pairsOfEntityNamesAndColumnsToSelect, String whereCondition,
-                                        Map<String,Object> namedParameters)throws IllegalStateException{
+                                        Map<String,Object> namedParameters, int start, int size)throws IllegalStateException{
 
         if(parentEntityName == null || parentEntityName.trim().equals("") || parentEntityAlias == null ||
                 parentEntityAlias.trim().equals("") || joinClauses == null || joinClauses.isEmpty() ||
@@ -306,6 +338,8 @@ public class DatabaseOperation{
                 createWhereClause(whereCondition) ;
         Query query = session.createQuery(queryString) ;
         setNamedParametersInQuery(query, namedParameters) ;
+        query.setFirstResult(start) ;
+        query.setMaxResults(size) ;
         List listOfTuples = query.list() ;
         session.close() ;
         return listOfTuples ;
