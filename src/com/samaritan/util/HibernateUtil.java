@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.samaritan.util ;
+package com.samaritan.util;
 
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;

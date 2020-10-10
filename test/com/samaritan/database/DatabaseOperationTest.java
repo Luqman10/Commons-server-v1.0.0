@@ -1,7 +1,8 @@
-package com.samaritan.util;
+package com.samaritan.database;
 
 import com.samaritan.entity.Department;
 import com.samaritan.entity.Employee;
+import com.samaritan.util.HibernateUtil;
 import javafx.util.Pair;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.After;

@@ -1,4 +1,4 @@
-package com.samaritan.util;
+package com.samaritan.database;
 
 import javafx.util.Pair;
 import org.hibernate.HibernateException;

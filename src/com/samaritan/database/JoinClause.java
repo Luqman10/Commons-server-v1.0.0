@@ -1,4 +1,4 @@
-package com.samaritan.util ;
+package com.samaritan.database;
 
 /**
  * This class represents a join clause. It has 3 parts:
@@ -15,7 +15,7 @@ public class JoinClause{
     private String parentEntityAlias ;
     private int joinType ;
 
-    JoinClause(String parentEntityAlias, String childEntityName, int joinType) throws IllegalStateException{
+    public JoinClause(String parentEntityAlias, String childEntityName, int joinType) throws IllegalStateException{
 
         //if join type is not one of [-1,0,1], throw ex
         if(joinType < LEFT_OUTER_JOIN || joinType > RIGHT_OUTER_JOIN)
