@@ -399,4 +399,11 @@ public class DatabaseOperationTest {
         boolean success = databaseOperation.updateRecordsInEntity(entityName, colsAndValues, whereCondition, namedParams) ;
         assertTrue(success) ;
     }
+
+    @Test
+    public void deleteAllRecordsFromEntity(){
+
+        boolean success = databaseOperation.deleteRecordsFromEntity("Department") ;
+        assertTrue(success) ;
+    }
 }

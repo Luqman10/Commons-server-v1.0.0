@@ -6,6 +6,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 
 import java.io.Serializable;
@@ -397,7 +398,7 @@ public class DatabaseOperation{
             throws HibernateException{
 
         Transaction transaction = null ;
-        int success = 0 ;
+        int affectedRows = 0 ;
 
         try (Session session = sessionFactory.openSession()) {
 
@@ -405,7 +406,7 @@ public class DatabaseOperation{
             String queryString = "UPDATE " + entityName + " SET " + columnsAndCorrespondingValues + " WHERE " + whereCondition ;
             Query query = session.createQuery(queryString) ;
             setNamedParametersInQuery(query, namedParameters) ;
-            success = query.executeUpdate() ;
+            affectedRows = query.executeUpdate() ;
             transaction.commit() ;
 
         }
@@ -415,9 +416,37 @@ public class DatabaseOperation{
             throw ex ;
         }
 
-        return success > 0 ;
+        return affectedRows > 0 ;
     }
 
+
+    /**
+     * delete all records from the given entity
+     * @param entityName the entity to delete from
+     * @throws HibernateException when there is an error in executing the query
+     * @return true if the delete operation was successful
+     */
+    public boolean deleteRecordsFromEntity(String entityName) throws HibernateException{
+
+        Transaction transaction = null ;
+        int affectedRows = 0 ;
+
+        try(Session session = sessionFactory.openSession()){
+
+            transaction = session.beginTransaction() ;
+            String queryString = "DELETE FROM " + entityName ;
+            NativeQuery query = session.createSQLQuery(queryString) ;
+            affectedRows = query.executeUpdate() ;
+            transaction.commit() ;
+        }
+        catch(HibernateException ex){
+
+            if(transaction != null) transaction.rollback() ;
+            throw ex ;
+        }
+
+        return affectedRows > 0 ;
+    }
 
     /**
      * create a comma separated string of all the columns(prefixed with 'entityAlias.') in the pairs in the list.
