@@ -406,4 +406,14 @@ public class DatabaseOperationTest {
         boolean success = databaseOperation.deleteRecordsFromEntity("Department") ;
         assertTrue(success) ;
     }
+
+    @Test
+    public void deleteRecordsThatSatisfyWhereConditionFromEntity(){
+
+        Map<String,Object> namedParams = new HashMap<>() ;
+        namedParams.put("id", 3) ;
+        boolean success = databaseOperation.deleteRecordsFromEntity("Department", "id = :id",
+                namedParams) ;
+        assertTrue(success) ;
+    }
 }

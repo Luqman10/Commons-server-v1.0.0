@@ -448,6 +448,40 @@ public class DatabaseOperation{
         return affectedRows > 0 ;
     }
 
+
+    /**
+     * delete records that satisfy the given where condition from the given entity
+     * @param entityName the entity to delete from
+     * @param whereCondition the condition to use in filtering the record deletion
+     * @param namedParameters a map of named params in the query and their replacement values
+     * @throws HibernateException when there is an error in executing the query
+     * @return true if the delete operation was successful
+     */
+    public boolean deleteRecordsFromEntity(String entityName, String whereCondition, Map<String,Object> namedParameters)
+            throws HibernateException{
+
+        Transaction transaction = null ;
+        int affectedRows = 0 ;
+
+        try(Session session = sessionFactory.openSession()){
+
+            transaction = session.beginTransaction() ;
+            String queryString = "DELETE FROM " + entityName + " WHERE " + whereCondition ;
+            NativeQuery query = session.createSQLQuery(queryString) ;
+            setNamedParametersInQuery(query, namedParameters) ;
+            affectedRows = query.executeUpdate() ;
+            transaction.commit() ;
+        }
+        catch(HibernateException ex){
+
+            if(transaction != null) transaction.rollback() ;
+            throw ex ;
+        }
+
+        return affectedRows > 0 ;
+    }
+
+
     /**
      * create a comma separated string of all the columns(prefixed with 'entityAlias.') in the pairs in the list.
      * NB: This method is used to create a columns string for columns belonging to different entities(alias).
