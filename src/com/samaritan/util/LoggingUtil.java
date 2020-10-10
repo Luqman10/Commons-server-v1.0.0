@@ -1,5 +1,7 @@
 package com.samaritan.util;
 
+import java.io.IOException;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,5 +19,27 @@ public class LoggingUtil{
     public static void logMessageToConsole(String name, Level level, String message){
 
         Logger.getLogger(name).log(level, message) ;
+    }
+
+    /**
+     * write log messages to the given file
+     * @param name the logger's name
+     * @param level severity level of the message
+     * @param message the log message
+     * @param fileName the name of the destination file
+     */
+    public static void logMessageToFile(String name, Level level, String message, String fileName){
+
+        Logger logger = Logger.getLogger(name) ;
+
+        try{
+            logger.addHandler(new FileHandler(fileName,true)) ;
+        }
+        catch(IOException ex){
+
+            ex.printStackTrace() ;
+        }
+
+        logger.log(level, message) ;
     }
 }

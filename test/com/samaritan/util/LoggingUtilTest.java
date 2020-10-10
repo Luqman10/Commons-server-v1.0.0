@@ -6,10 +6,21 @@ import java.util.logging.Level;
 
 public class LoggingUtilTest{
 
+    private String message = "Hello world" ;
+    private String name = "com.samaritan.util.LoggingUtilTest" ;
+
     @Test
     public void logMessageToConsole(){
 
-        String message = "Hello world" ;
-        LoggingUtil.logMessageToConsole("com.samaritan.util.LoggingUtilTest", Level.INFO, message) ;
+        LoggingUtil.logMessageToConsole(name, Level.INFO, message) ;
+    }
+
+
+    @Test
+    public void logMessageToFile(){
+
+        String fileName = "C:\\Users\\electron\\Downloads\\Documents\\server_log.txt" ;
+        LoggingUtil.logMessageToFile(name, Level.INFO, message, fileName) ;
+
     }
 }
