@@ -5,6 +5,8 @@
  */
 package com.samaritan.entity;
 
+import com.google.gson.annotations.Expose;
+
 import javax.persistence.*;
 
 /**
@@ -18,15 +20,19 @@ public class Employee{
     @Id
     @Column(name = "id", nullable = false, unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Expose
     private Integer id ;
     
     @Column(name = "f_name", nullable = false, length = 50)
+    @Expose
     private String firstName ;
     
     @Column(name = "l_name", nullable = false, length = 50)
+    @Expose
     private String lastName ;
     
     @Column(name = "email", nullable = false, length = 50)
+    @Expose
     private String email ;
 
     
@@ -63,6 +69,17 @@ public class Employee{
         this.email = email;
     }
     
-    
+    @Override
+    public boolean equals(Object object){
+
+        if (this == object) return true ;
+        if (object == null || getClass() != object.getClass()) return false ;
+
+        Employee employee = (Employee)object ;
+        return id.equals(employee.getId()) &&
+               firstName.equals(employee.getFirstName()) &&
+               lastName.equals(employee.getLastName()) &&
+               email.equals(employee.getEmail()) ;
+    }
     
 }
