@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="modules">
+    <CLASSES>
+      <root url="file://D:/CodingTools/java_ee_sdk-8/glassfish5/glassfish/modules" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://D:/CodingTools/java_ee_sdk-8/glassfish5/glassfish/modules" />
+    </SOURCES>
+    <jarDirectory url="file://D:/CodingTools/java_ee_sdk-8/glassfish5/glassfish/modules" recursive="false" />
+    <jarDirectory url="file://D:/CodingTools/java_ee_sdk-8/glassfish5/glassfish/modules" recursive="false" type="SOURCES" />
+  </library>
+</component>

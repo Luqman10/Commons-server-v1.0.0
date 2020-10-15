@@ -13,5 +13,6 @@
     <orderEntry type="library" name="mysql-connector-java-5.1.40-bin" level="project" />
     <orderEntry type="library" name="required" level="project" />
     <orderEntry type="library" name="gson-2.8.1" level="project" />
+    <orderEntry type="library" name="modules" level="project" />
   </component>
 </module>
