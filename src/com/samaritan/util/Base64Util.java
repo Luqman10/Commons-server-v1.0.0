@@ -24,9 +24,12 @@ public class Base64Util {
 
         try (FileInputStream fileInputStream = new FileInputStream(file)) {
             byte[] bytes = new byte[(int)file.length()] ;
-            fileInputStream.read(bytes) ;
-            Base64.Encoder encoder = Base64.getEncoder() ;
-            base64Representation = encoder.encodeToString(bytes) ;
+            int numberOfBytesRead = fileInputStream.read(bytes) ;
+            if(numberOfBytesRead != -1){
+
+                Base64.Encoder encoder = Base64.getEncoder() ;
+                base64Representation = encoder.encodeToString(bytes) ;
+            }
         }
         catch (IOException ex){
 
