@@ -3,17 +3,42 @@ package com.samaritan.util;
 import org.junit.Test;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.* ;
 
 public class Base64UtilTest {
 
     @Test
-    public void convertFileToBase64(){
+    public void convertFileToBase64ReturnsStringForNonEmptyFile(){
 
-        String fileName = "C:\\Users\\electron\\Downloads\\Music\\O_leal.mp3" ;
-        File file = new File(fileName) ;
-        String base64 = Base64Util.convertFileToBase64(file) ;
-        assertNotNull(base64) ;
+        try{
+
+            URI uri = getClass().getResource("/com/samaritan/asset/O_leal.mp3").toURI() ;
+            File file = new File(uri) ;
+            String base64 = Base64Util.convertFileToBase64(file) ;
+            assertNotNull(base64) ;
+        }
+        catch(URISyntaxException ex){
+
+            ex.printStackTrace() ;
+        }
+    }
+
+    @Test
+    public void convertFileToBase64ReturnsEmptyStringForEmptyFile(){
+
+        try{
+
+            URI uri = getClass().getResource("/com/samaritan/asset/empty_file.mp3").toURI() ;
+            File file = new File(uri) ;
+            String base64 = Base64Util.convertFileToBase64(file) ;
+            assertEquals("", base64) ;
+        }
+        catch(URISyntaxException ex){
+
+            ex.printStackTrace() ;
+        }
     }
 }
